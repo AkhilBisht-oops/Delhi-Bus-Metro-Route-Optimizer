@@ -1,30 +1,139 @@
+import { useState } from "react";
+
 export default function Header() {
+  const [open, setOpen] = useState(false);
+
+  const scrollTo = (id) => {
+    setOpen(false);
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-4 py-4">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center space-x-2 mb-4 md:mb-0">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                        <i class="fas fa-subway text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-900">Delhi Route Optimizer</h1>
-                        <p class="text-sm text-gray-600">Metro + Bus Integration</p>
-                    </div>
-                </div>
-                
-                <div class="flex flex-wrap gap-4 items-center">
-                    <a href="javascript:void(0)" class="text-gray-700 hover:text-primary font-medium">Home</a>
-                    <a href="javascript:void(0)" class="text-gray-700 hover:text-primary font-medium">Features</a>
-                    <a href="javascript:void(0)" class="text-gray-700 hover:text-primary font-medium">Metro Map</a>
-                    <a href="javascript:void(0)" class="text-gray-700 hover:text-primary font-medium">Bus Routes</a>
-                    <a href="javascript:void(0)" class="text-gray-700 hover:text-primary font-medium">Fare Calculator</a>
-                    <button class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition-colors">
-                        Get Started
-                    </button>
-                </div>
+    <header className="bg-[#020617] border-b border-gray-800 sticky top-0 z-50">
+      <nav className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+
+          {/* LOGO */}
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => scrollTo("home")}
+          >
+            {/* SVG LOGO */}
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center
+                         bg-gradient-to-br from-blue-600 to-cyan-400
+                         shadow-[0_0_25px_rgba(59,130,246,0.8)]"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Route Nodes */}
+                <circle cx="5" cy="12" r="2" fill="white" />
+                <circle cx="19" cy="5" r="2" fill="white" />
+                <circle cx="19" cy="19" r="2" fill="white" />
+
+                {/* Connections */}
+                <path
+                  d="M7 12 L17 6 M7 12 L17 18"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
             </div>
-        </nav>
+
+            {/* TEXT */}
+            <div>
+              <h1 className="text-lg font-bold text-gray-100 tracking-wide">
+                Delhi Route Optimizer
+              </h1>
+              <p className="text-xs text-gray-400">
+                Smart Metro + Bus Routing
+              </p>
+            </div>
+          </div>
+
+          {/* DESKTOP NAV */}
+          <div className="hidden md:flex items-center gap-6 text-sm">
+            <button onClick={() => scrollTo("home")} className="nav-dark">
+              Home
+            </button>
+            <button onClick={() => scrollTo("features")} className="nav-dark">
+              Features
+            </button>
+            <button onClick={() => scrollTo("metro-map")} className="nav-dark">
+              Metro Map
+            </button>
+            <button onClick={() => scrollTo("routes")} className="nav-dark">
+              Routes
+            </button>
+            <button
+              onClick={() => scrollTo("fare-calculator")}
+              className="nav-dark"
+            >
+              Fare Calculator
+            </button>
+
+            <button
+              onClick={() => scrollTo("home")}
+              className="ml-4 px-6 py-2 rounded-lg text-white
+                         bg-blue-600 hover:bg-blue-500 transition
+                         shadow-[0_0_15px_rgba(59,130,246,0.7)]"
+            >
+              Get Started
+            </button>
+          </div>
+
+          {/* MOBILE BUTTON */}
+          <button
+            className="md:hidden text-gray-300 text-2xl"
+            onClick={() => setOpen(!open)}
+          >
+            <i className="fas fa-bars"></i>
+          </button>
+        </div>
+
+        {/* MOBILE MENU */}
+        {open && (
+          <div className="md:hidden mt-4 bg-[#020617] border border-gray-800 rounded-xl p-4 space-y-3">
+            {[
+              ["Home", "home"],
+              ["Features", "features"],
+              ["Metro Map", "metro-map"],
+              ["Routes", "routes"],
+              ["Fare Calculator", "fare-calculator"],
+            ].map(([label, id]) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                className="block w-full text-left text-gray-300
+                           hover:text-blue-400 transition"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </nav>
+
+      {/* NAV BUTTON STYLE */}
+      <style>{`
+        .nav-dark {
+          color: #9ca3af;
+          transition: all 0.2s ease;
+        }
+        .nav-dark:hover {
+          color: #60a5fa;
+          text-shadow: 0 0 10px rgba(96,165,250,0.8);
+        }
+      `}</style>
     </header>
   );
 }

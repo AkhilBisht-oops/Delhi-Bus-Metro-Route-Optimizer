@@ -5,7 +5,6 @@ export default function Footer() {
   const [transportLinks, setTransportLinks] = useState([]);
   const [email, setEmail] = useState("");
 
-  // 🔹 Load footer data (API-ready)
   useEffect(() => {
     setQuickLinks([
       "Metro Timings",
@@ -34,56 +33,59 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gray-900 text-white mt-12">
+    <footer className="bg-[#020617] border-t border-gray-800 text-gray-400 mt-16">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 
           {/* Brand */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <div className="flex items-center space-x-3 mb-4">
+              <div
+                className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center
+                           shadow-[0_0_20px_rgba(59,130,246,0.7)]"
+              >
                 <i className="fas fa-subway text-white text-xl"></i>
               </div>
               <div>
-                <h3 className="text-xl font-bold">
+                <h3 className="text-xl font-bold text-gray-100">
                   Delhi Route Optimizer
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500">
                   Smart Commute Planning
                 </p>
               </div>
             </div>
 
-            <p className="text-gray-400 mb-4">
+            <p className="text-gray-500 mb-4 text-sm leading-relaxed">
               Your intelligent partner for navigating Delhi's public transport
               system efficiently.
             </p>
 
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">
-                <i className="fab fa-twitter"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <i className="fab fa-facebook"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <i className="fab fa-instagram"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <i className="fab fa-linkedin"></i>
-              </a>
+            <div className="flex space-x-4 text-lg">
+              {["twitter", "facebook", "instagram", "linkedin"].map((icon) => (
+                <a
+                  key={icon}
+                  href="#"
+                  className="text-gray-500 hover:text-blue-400 transition
+                             hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]"
+                >
+                  <i className={`fab fa-${icon}`}></i>
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-bold text-lg mb-4">Quick Links</h4>
-            <ul className="space-y-2">
+            <h4 className="font-semibold text-gray-200 mb-4 tracking-wide">
+              Quick Links
+            </h4>
+            <ul className="space-y-2 text-sm">
               {quickLinks.map((link, index) => (
                 <li key={index}>
                   <a
                     href="#"
-                    className="text-gray-400 hover:text-white"
+                    className="hover:text-blue-400 transition"
                   >
                     {link}
                   </a>
@@ -94,13 +96,15 @@ export default function Footer() {
 
           {/* Transport Info */}
           <div>
-            <h4 className="font-bold text-lg mb-4">Transport Info</h4>
-            <ul className="space-y-2">
+            <h4 className="font-semibold text-gray-200 mb-4 tracking-wide">
+              Transport Info
+            </h4>
+            <ul className="space-y-2 text-sm">
               {transportLinks.map((link, index) => (
                 <li key={index}>
                   <a
                     href="#"
-                    className="text-gray-400 hover:text-white"
+                    className="hover:text-blue-400 transition"
                   >
                     {link}
                   </a>
@@ -111,8 +115,10 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="font-bold text-lg mb-4">Newsletter</h4>
-            <p className="text-gray-400 mb-4">
+            <h4 className="font-semibold text-gray-200 mb-4 tracking-wide">
+              Newsletter
+            </h4>
+            <p className="text-gray-500 mb-4 text-sm">
               Get updates on route changes and new features
             </p>
 
@@ -122,30 +128,33 @@ export default function Footer() {
                 placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-grow p-3 rounded-l-lg text-gray-900 outline-none"
+                className="flex-grow p-3 rounded-l-lg bg-black
+                           border border-gray-700 text-gray-200
+                           placeholder-gray-500 outline-none"
               />
               <button
                 onClick={handleSubscribe}
-                className="bg-primary px-4 rounded-r-lg hover:bg-secondary"
+                className="bg-blue-600 px-4 rounded-r-lg
+                           hover:bg-blue-500 transition
+                           shadow-[0_0_15px_rgba(59,130,246,0.6)]"
               >
-                <i className="fas fa-paper-plane"></i>
+                <i className="fas fa-paper-plane text-white"></i>
               </button>
             </div>
 
-            <p className="text-sm text-gray-500 mt-4">
-              We respect your privacy. Unsubscribe at any time.
+            <p className="text-xs text-gray-500 mt-3">
+              We respect your privacy. Unsubscribe anytime.
             </p>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+        <div className="border-t border-gray-800 mt-10 pt-6 text-center text-gray-500 text-xs">
           <p>
-            © 2024 Delhi Route Optimizer. All rights reserved. | Data provided by
-            DMRC & DTC
+            © 2026 Delhi Route Optimizer • Data provided by DMRC & DTC
           </p>
-          <p className="mt-2 text-sm">
-            This is a demonstration website for route optimization concepts.
+          <p className="mt-1">
+            Demonstration project for route optimization concepts.
           </p>
         </div>
       </div>

@@ -1,29 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Routes from "./components/Routes";
 import Features from "./components/Features";
 import MetroLines from "./components/MetroLines";
+import FareCalculator from "./components/FareCalculator";
 import PopularRoutes from "./components/PopularRoutes";
 import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
 
 export default function App() {
-  // 🔹 Shared state
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState(null);
 
-  // 🔹 Set current time (replaces old JS function)
+  const fareRef = useRef(null);
+
+  // Set current time on load
   useEffect(() => {
     const now = new Date().toISOString().slice(0, 16);
     setTime(now);
   }, []);
 
-  // 🔹 Find route logic
   const findRoute = () => {
     if (!from || !to) {
       alert("Please enter both starting point and destination");
@@ -31,25 +32,30 @@ export default function App() {
     }
 
     setLoading(true);
-
     setTimeout(() => {
       setLoading(false);
-      setSelectedRoute(1); // auto-select first route
     }, 1500);
   };
 
-  // 🔹 Route selection
   const selectRoute = (route) => {
-    setSelectedRoute(route.id);
-    alert(
-      `Selected: ${route.title}\nTime: ${route.time} mins\nFare: ₹${route.fare}`
-    );
+    if (!route) return;
+
+    setSelectedRoute(route);
+
+    // Smooth scroll to fare calculator
+    requestAnimationFrame(() => {
+      fareRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0b0f19] text-gray-900 dark:text-gray-100 transition-colors">
       <Header />
 
+      {/* Home */}
       <Hero
         from={from}
         to={to}
@@ -62,14 +68,30 @@ export default function App() {
       />
 
       <main className="container mx-auto px-4 py-12 space-y-12">
-        <Routes
-          selectedRoute={selectedRoute}
-          onSelectRoute={selectRoute}
-        />
+        {/* Routes */}
+        <section id="routes">
+          <Routes
+            selectedRoute={selectedRoute}
+            onSelectRoute={selectRoute}
+          />
+        </section>
 
-        <Features />
-        <MetroLines />
+        {/* Fare Calculator */}
+        <section id="fare-calculator" ref={fareRef}>
+          <FareCalculator selectedRoute={selectedRoute} />
+        </section>
 
+        {/* Features */}
+        <section id="features">
+          <Features />
+        </section>
+
+        {/* Metro Map */}
+        <section id="metro-map">
+          <MetroLines />
+        </section>
+
+        {/* Popular Routes */}
         <PopularRoutes
           onPlanRoute={(route) => {
             setFrom(route.from);

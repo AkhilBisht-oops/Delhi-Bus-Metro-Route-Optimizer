@@ -1,105 +1,64 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const routeSchema = new mongoose.Schema({
-  routeNumber: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  type: {
-    type: String,
-    enum: ['metro', 'bus', 'rapidTransit'],
-    required: true
-  },
-  line: {
-    type: String,
-    trim: true
-  },
-  color: {
-    type: String,
-    default: '#000000'
-  },
-  origin: {
-    type: String,
-    required: true
-  },
-  destination: {
-    type: String,
-    required: true
-  },
-  stops: [{
-    name: {
-      type: String,
-      required: true
-    },
-    coordinates: {
-      lat: {
-        type: Number,
-        required: true
-      },
-      lng: {
-        type: Number,
-        required: true
-      }
-    },
-    sequence: {
-      type: Number,
-      required: true
-    }
-  }],
-  geometry: {
+const routeSchema = new mongoose.Schema(
+  {
+    routeNumber: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     type: {
       type: String,
-      enum: ['LineString'],
-      default: 'LineString'
-    },
-    coordinates: [[Number]]
-  },
-  operatingHours: {
-    start: {
-      type: String,
+      enum: ["metro", "bus", "rapidTransit"],
       required: true,
-      default: '06:00'
     },
-    end: {
-      type: String,
-      required: true,
-      default: '23:00'
-    }
-  },
-  frequency: {
-    type: Number,
-    default: 10
-  },
-  fare: {
-    min: {
-      type: Number,
-      required: true
+    line: String,
+    color: String,
+    origin: String,
+    destination: String,
+
+    stops: [
+      {
+        name: { type: String, required: true },
+        sequence: { type: Number, required: true },
+
+        location: {
+          type: {
+            type: String,
+            enum: ["Point"],
+            required: true,
+          },
+          coordinates: {
+            type: [Number], // [lng, lat]
+            required: true,
+          },
+        },
+      },
+    ],
+
+    geometry: {
+      type: {
+        type: String,
+        enum: ["LineString"],
+        default: "LineString",
+      },
+      coordinates: [[Number]],
     },
-    max: {
-      type: Number,
-      required: true
-    }
+
+    operatingHours: {
+      start: String,
+      end: String,
+    },
+
+    frequency: Number,
+    fare: {
+      min: Number,
+      max: Number,
+    },
+
+    isActive: { type: Boolean, default: true },
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
+  { timestamps: true }
+);
 
-// Index for geospatial queries
-routeSchema.index({ 'stops.coordinates': '2dsphere' });
-routeSchema.index({ type: 1, isActive: 1 });
+/* ✅ THIS INDEX IS MANDATORY */
+routeSchema.index({ "stops.location": "2dsphere" });
 
-const Route =
-  mongoose.models.Route || mongoose.model('Route', routeSchema);
-
-module.exports = Route;
+module.exports = mongoose.model("Route", routeSchema);

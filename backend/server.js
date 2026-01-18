@@ -38,6 +38,10 @@ app.use('/api/transit', transitRoutes);
 // Error handling
 app.use(errorHandler);
 
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
+
 // Database connection and server start
 const startServer = async () => {
   try {

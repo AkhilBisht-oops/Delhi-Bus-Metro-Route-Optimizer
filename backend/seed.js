@@ -108,15 +108,10 @@ const sampleRoutes = [
       stop("Azadpur", 28.7041, 77.1753, 3),
       stop("Rohini Sector 24", 28.7412, 77.1110, 4),
     ],
-    geometry: {
-      type: "LineString",
-      coordinates: [
-        [77.2281, 28.6677],
-        [77.2161, 28.6733],
-        [77.1753, 28.7041],
-        [77.1110, 28.7412],
-      ],
-    },
+    location: {
+    type: "Point",
+    coordinates: [77.2197, 28.6328]
+  },
     operatingHours: { start: "05:30", end: "23:30" },
     frequency: 15,
     fare: { min: 5, max: 25 },

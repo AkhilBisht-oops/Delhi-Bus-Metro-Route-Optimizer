@@ -17,11 +17,12 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
 app.use(morgan('dev'));
+
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,9 +39,7 @@ app.use('/api/transit', transitRoutes);
 // Error handling
 app.use(errorHandler);
 
-app.use(cors({
-  origin: "http://localhost:5173"
-}));
+
 
 // Database connection and server start
 const startServer = async () => {

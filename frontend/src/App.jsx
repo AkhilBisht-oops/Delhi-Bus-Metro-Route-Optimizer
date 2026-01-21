@@ -9,6 +9,8 @@ import FareCalculator from "./components/FareCalculator";
 import PopularRoutes from "./components/PopularRoutes";
 import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
+import LiveMap from "./components/LiveMap";
+
 
 export default function App() {
   const [from, setFrom] = useState("");
@@ -16,10 +18,11 @@ export default function App() {
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState(null);
+  const [mapRoutes, setMapRoutes] = useState([]);
+
 
   const fareRef = useRef(null);
 
-  // Set current time on load
   useEffect(() => {
     const now = new Date().toISOString().slice(0, 16);
     setTime(now);
@@ -32,17 +35,12 @@ export default function App() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+    setTimeout(() => setLoading(false), 1200);
   };
 
   const selectRoute = (route) => {
-    if (!route) return;
-
     setSelectedRoute(route);
 
-    // Smooth scroll to fare calculator
     requestAnimationFrame(() => {
       fareRef.current?.scrollIntoView({
         behavior: "smooth",
@@ -52,10 +50,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0b0f19] text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-[#0b0f19] text-gray-100">
       <Header />
 
-      {/* Home */}
       <Hero
         from={from}
         to={to}
@@ -67,31 +64,25 @@ export default function App() {
         loading={loading}
       />
 
-      <main className="container mx-auto px-4 py-12 space-y-12">
+      <main className="container mx-auto px-4 py-12 space-y-16">
         {/* Routes */}
-        <section id="routes">
-          <Routes
-            selectedRoute={selectedRoute}
-            onSelectRoute={selectRoute}
-          />
-        </section>
+        <Routes
+          selectedRoute={selectedRoute}
+          onSelectRoute={selectRoute}
+          onRoutesLoaded={setMapRoutes}
+        />
+        {selectedRoute && (
+          <LiveMap route={selectedRoute} />
+        )}
 
         {/* Fare Calculator */}
-        <section id="fare-calculator" ref={fareRef}>
+        <div ref={fareRef} id="fare-calculator">
           <FareCalculator selectedRoute={selectedRoute} />
-        </section>
+        </div>
 
-        {/* Features */}
-        <section id="features">
-          <Features />
-        </section>
+        <Features />
+        <MetroLines />
 
-        {/* Metro Map */}
-        <section id="metro-map">
-          <MetroLines />
-        </section>
-
-        {/* Popular Routes */}
         <PopularRoutes
           onPlanRoute={(route) => {
             setFrom(route.from);

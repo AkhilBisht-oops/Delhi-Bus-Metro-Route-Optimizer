@@ -1,45 +1,51 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 
-export default function Routes({ selectedRoute, onSelectRoute }) {
-  const [sortBy, setSortBy] = useState("Fastest");
-  const [expanded, setExpanded] = useState(null);
+export default function Routes({ selectedRoute, onSelectRoute, onRoutesLoaded }) {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [sortBy, setSortBy] = useState("Fastest");
+  const [expanded, setExpanded] = useState(null);
 
-  // 🔹 Fetch routes from backend
+  // nearby | all
+  const [mode, setMode] = useState("nearby");
+
   useEffect(() => {
-    const fetchNearbyRoutes = async () => {
+    const fetchRoutes = async () => {
       try {
         setLoading(true);
 
-        // Connaught Place coordinates (example)
-        const lat = 28.6328;
-        const lng = 77.2197;
+        let res;
+        if (mode === "nearby") {
+          res = await api.get(
+            "/routes/nearby?lat=28.6328&lng=77.2197&radius=3000"
+          );
+        } else {
+          res = await api.get("/routes");
+        }
 
-        const res = await api.get(
-          `/routes/nearby?lat=${lat}&lng=${lng}&radius=3000`
-        );
+        // ✅ CORRECT RESPONSE KEY
+        setRoutes(res.data.routes);
+        onRoutesLoaded?.(res.data.routes);
 
-        setRoutes(res.data.data);
-      } catch (error) {
-        console.error("Nearby routes fetch failed", error);
+      } catch (err) {
+        console.error("Failed to load routes", err);
+        setRoutes([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNearbyRoutes();
-  }, []);
+    fetchRoutes();
+  }, [mode]);
 
-  // 🔹 Sorting logic (memoized)
   const sortedRoutes = useMemo(() => {
-    const list = [...routes];
+    const list = Array.isArray(routes) ? [...routes] : [];
 
     if (sortBy === "Fastest") {
-      // lower frequency = faster availability
-      return list.sort((a, b) => (a.frequency ?? 999) - (b.frequency ?? 999));
+      return list.sort(
+        (a, b) => (a.frequency ?? 999) - (b.frequency ?? 999)
+      );
     }
 
     if (sortBy === "Cheapest") {
@@ -51,7 +57,6 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
     return list;
   }, [routes, sortBy]);
 
-  // 🔹 Loading
   if (loading) {
     return (
       <section className="text-gray-400 text-center py-12">
@@ -60,16 +65,6 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
     );
   }
 
-  // 🔹 Error
-  if (error) {
-    return (
-      <section className="text-red-400 text-center py-12">
-        {error}
-      </section>
-    );
-  }
-
-  // 🔹 Empty state
   if (sortedRoutes.length === 0) {
     return (
       <section className="text-gray-400 text-center py-12">
@@ -81,19 +76,44 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
   return (
     <section id="routes" className="mb-16">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-wrap gap-4 justify-between items-center mb-8">
         <h3 className="text-2xl font-bold text-gray-100">
           Recommended Routes
         </h3>
 
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="bg-[#020617] border border-gray-700 text-gray-200 p-2 rounded-lg"
-        >
-          <option value="Fastest">Fastest</option>
-          <option value="Cheapest">Cheapest</option>
-        </select>
+        <div className="flex gap-3">
+          {/* Mode Toggle */}
+          <button
+            onClick={() => setMode("nearby")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium ${
+              mode === "nearby"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+            }`}
+          >
+            Nearby
+          </button>
+
+          <button
+            onClick={() => setMode("all")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium ${
+              mode === "all"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+            }`}
+          >
+            All Routes
+          </button>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-[#020617] border border-gray-700 text-gray-200 p-2 rounded-lg"
+          >
+            <option value="Fastest">Fastest</option>
+            <option value="Cheapest">Cheapest</option>
+          </select>
+        </div>
       </div>
 
       {/* Routes Grid */}
@@ -105,21 +125,18 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
           return (
             <div
               key={route._id}
-              className={`bg-[#020617] border border-gray-800 rounded-xl p-6 
-                shadow-lg transition-all duration-300
-                ${
-                  isSelected
-                    ? "ring-2 ring-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.6)]"
-                    : ""
-                }`}
+              className={`bg-[#020617] border border-gray-800 rounded-xl p-6 shadow-lg transition-all ${
+                isSelected
+                  ? "ring-2 ring-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.6)]"
+                  : ""
+              }`}
             >
-              {/* Top */}
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h4 className="text-lg font-bold text-gray-100">
                     {route.name}
                   </h4>
-                  <span className="inline-block mt-2 bg-black text-gray-300 px-3 py-1 rounded-full text-xs tracking-wide">
+                  <span className="inline-block mt-2 bg-black text-gray-300 px-3 py-1 rounded-full text-xs">
                     {route.type?.toUpperCase()}
                   </span>
                 </div>
@@ -134,7 +151,7 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
                 </div>
               </div>
 
-              {/* Route Stops */}
+              {/* Stops */}
               {route.stops?.length > 0 && (
                 <>
                   <button
@@ -143,17 +160,14 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
                     }
                     className="text-sm text-blue-400 hover:underline mb-3"
                   >
-                    {isOpen ? "Hide route details" : "View route details"}
+                    {isOpen ? "Hide details" : "View route details"}
                   </button>
 
                   {isOpen && (
                     <ul className="mb-4 space-y-2 text-gray-400 text-sm">
-                      {route.stops.map((stop, index) => (
-                        <li key={index} className="flex gap-2">
-                          <span className="text-blue-500">
-                            {index + 1}.
-                          </span>
-                          {stop.name}
+                      {route.stops.map((stop, i) => (
+                        <li key={i}>
+                          {i + 1}. {stop.name}
                         </li>
                       ))}
                     </ul>
@@ -161,15 +175,13 @@ export default function Routes({ selectedRoute, onSelectRoute }) {
                 </>
               )}
 
-              {/* Select Button */}
               <button
                 onClick={() => onSelectRoute(route)}
-                className={`w-full py-3 rounded-lg font-semibold transition
-                  ${
-                    isSelected
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                  }`}
+                className={`w-full py-3 rounded-lg font-semibold transition ${
+                  isSelected
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                }`}
               >
                 {isSelected ? "✓ Selected" : "Select Route"}
               </button>
